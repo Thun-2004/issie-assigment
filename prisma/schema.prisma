@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../generated/prisma"
+// }
+
+ generator client {
+  provider = "prisma-client-js"
+  output = "../../node_modules/.prisma/client"
+}
+
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Rider {
+  id           Int      @id @default(autoincrement())
+  firstname    String
+  lastName     String
+  email        String   @unique
+  licensePlate String   @unique
+  phoneNumber  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  locations    Location[]
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  riderId   Int
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  rider     Rider    @relation(fields: [riderId], references: [id])
+}
