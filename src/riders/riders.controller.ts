@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe} from '@nestjs/common';
 import { RiderService } from './riders.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
@@ -12,7 +12,7 @@ export class RiderController {
 
   @Post()
   @ApiOperation({ summary: 'Create new rider' })
-  create(@Body() createRiderDto: CreateRiderDto) {
+  create(@Body(ValidationPipe) createRiderDto: CreateRiderDto) {
     return this.riderService.create(createRiderDto);
   }
 
@@ -40,7 +40,7 @@ export class RiderController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update rider by ID' })
   @ApiParam({ name: 'id', type: Number })
-  update(@Param('id') id: string, @Body() updateRiderDto: UpdateRiderDto) {
+  update(@Param('id') id: string, @Body(ValidationPipe) updateRiderDto: UpdateRiderDto) {
     return this.riderService.update(+id, updateRiderDto);
   }
 
@@ -63,7 +63,7 @@ export class RiderController {
   @ApiParam({ name: 'riderId', type: Number })
   createLocation(
     @Param('riderId') riderId: string,
-    @Body() body: CreateLocationDto,
+    @Body(ValidationPipe) body: CreateLocationDto,
   ) {
     return this.riderService.createLocation(+riderId, body);
   }
