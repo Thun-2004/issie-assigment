@@ -4,6 +4,8 @@ import { PrismaService } from '../prisma.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
 import { CreateLocationDto } from './dto/create-location.dto';
+import { Prisma } from '@prisma/client';
+
 
 @Injectable()
 export class RiderService {
@@ -13,6 +15,11 @@ export class RiderService {
     try {
       return await this.prisma.rider.create({ data });
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const target = (error.meta?.target as string[]) || [];
+        const duplicatedFields = target.join(', ');
+        throw new BadRequestException(`Pre-existed value for: ${duplicatedFields}`);
+      }
       throw new BadRequestException('Failed to create rider');
     }
   }
