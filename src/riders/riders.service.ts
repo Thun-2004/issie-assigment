@@ -13,7 +13,20 @@ export class RiderService {
 
   async create(data: CreateRiderDto) {
     try {
-      return await this.prisma.rider.create({ data });
+      const result = await this.prisma.rider.create({ data });
+      return {
+          success: true,
+          message: 'Rider created successfully',
+          data: {
+            id: result.id,
+            firstname: result.firstname,
+            lastName: result.lastName,
+            email: result.email,
+            licensePlate: result.licensePlate,
+            phoneNumber: result.phoneNumber,
+          }
+        }
+      
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         const target = (error.meta?.target as string[]) || [];
@@ -69,7 +82,8 @@ export class RiderService {
     if (!rider) throw new NotFoundException('Rider not found');
 
     try {
-      return await this.prisma.location.findMany({ where: { riderId } });
+      const locations = await this.prisma.location.findMany({ where: { riderId } });
+      return { latitude: locations[0]?.latitude, longitude: locations[0]?.longitude };
     } catch (error) {
       throw new BadRequestException('Failed to fetch locations');
     }
@@ -80,9 +94,19 @@ export class RiderService {
     if (!rider) throw new NotFoundException('Rider not found');
 
     try {
-      return await this.prisma.location.create({
+      const result = await this.prisma.location.create({
         data: { riderId, ...locations },
       });
+      if (result) {
+        return {
+          success: true,
+          message: 'Location created successfully',
+          data: {
+            latitude: result.latitude,
+            longitude: result.longitude,
+          }
+        }
+      }
     } catch (error) {
       throw new BadRequestException('Failed to create location');
     }

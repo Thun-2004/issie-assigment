@@ -67,6 +67,4 @@ export class RiderController {
   ) {
     return this.riderService.createLocation(+riderId, body);
   }
-
-  
 }
