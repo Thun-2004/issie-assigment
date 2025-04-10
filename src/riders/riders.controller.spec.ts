@@ -66,7 +66,10 @@ describe('RiderController', () => {
 
   it('should call createLocation()', async () => {
     await controller.createLocation('1', { latitude: 13.7, longitude: 100.5 });
-    expect(service.createLocation).toHaveBeenCalledWith(1, { latitude: 13.7, longitude: 100.5 });
+    expect(service.createLocation).toHaveBeenCalledWith(1, {
+      latitude: 13.7,
+      longitude: 100.5,
+    });
   });
 
   it('should call searchNearby()', async () => {

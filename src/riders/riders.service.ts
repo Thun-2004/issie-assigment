@@ -1,11 +1,14 @@
-
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { Prisma } from '@prisma/client';
-
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class RiderService {
@@ -15,23 +18,27 @@ export class RiderService {
     try {
       const result = await this.prisma.rider.create({ data });
       return {
-          success: true,
-          message: 'Rider created successfully',
-          data: {
-            id: result.id,
-            firstname: result.firstname,
-            lastName: result.lastName,
-            email: result.email,
-            licensePlate: result.licensePlate,
-            phoneNumber: result.phoneNumber,
-          }
-        }
-      
+        success: true,
+        message: 'Rider created successfully',
+        data: {
+          id: result.id,
+          firstname: result.firstname,
+          lastName: result.lastName,
+          email: result.email,
+          licensePlate: result.licensePlate,
+          phoneNumber: result.phoneNumber,
+        },
+      };
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         const target = (error.meta?.target as string[]) || [];
         const duplicatedFields = target.join(', ');
-        throw new BadRequestException(`Pre-existed value for: ${duplicatedFields}`);
+        throw new BadRequestException(
+          `Pre-existed value for: ${duplicatedFields}`,
+        );
       }
       throw new BadRequestException('Failed to create rider');
     }
@@ -76,21 +83,31 @@ export class RiderService {
   }
 
   async findLocations(riderId: number) {
-    if (!riderId || isNaN(riderId)) throw new BadRequestException('Invalid rider ID');
+    if (!riderId || isNaN(riderId))
+      throw new BadRequestException('Invalid rider ID');
 
-    const rider = await this.prisma.rider.findUnique({ where: { id: riderId } });
+    const rider = await this.prisma.rider.findUnique({
+      where: { id: riderId },
+    });
     if (!rider) throw new NotFoundException('Rider not found');
 
     try {
-      const locations = await this.prisma.location.findMany({ where: { riderId } });
-      return { latitude: locations[0]?.latitude, longitude: locations[0]?.longitude };
+      const locations = await this.prisma.location.findMany({
+        where: { riderId },
+      });
+      return {
+        latitude: locations[0]?.latitude,
+        longitude: locations[0]?.longitude,
+      };
     } catch (error) {
       throw new BadRequestException('Failed to fetch locations');
     }
   }
 
   async createLocation(riderId: number, locations: CreateLocationDto) {
-    const rider = await this.prisma.rider.findUnique({ where: { id: riderId } });
+    const rider = await this.prisma.rider.findUnique({
+      where: { id: riderId },
+    });
     if (!rider) throw new NotFoundException('Rider not found');
 
     try {
@@ -104,8 +121,8 @@ export class RiderService {
           data: {
             latitude: result.latitude,
             longitude: result.longitude,
-          }
-        }
+          },
+        };
       }
     } catch (error) {
       throw new BadRequestException('Failed to create location');
@@ -142,7 +159,12 @@ export class RiderService {
     }
   }
 
-  private getDistanceFromLatLonInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  private getDistanceFromLatLonInKm(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ) {
     const R = 6371;
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
@@ -150,7 +172,8 @@ export class RiderService {
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.deg2rad(lat1)) *
         Math.cos(this.deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }

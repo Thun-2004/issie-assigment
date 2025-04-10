@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ValidationPipe} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  ValidationPipe,
+} from '@nestjs/common';
 import { RiderService } from './riders.service';
 import { CreateRiderDto } from './dto/create-rider.dto';
 import { UpdateRiderDto } from './dto/update-rider.dto';
@@ -26,7 +36,10 @@ export class RiderController {
   @ApiOperation({ summary: 'Search riders within 5km radius' })
   @ApiQuery({ name: 'latitude', type: Number })
   @ApiQuery({ name: 'longitude', type: Number })
-  searchNearby(@Query('latitude') latitude: string, @Query('longitude') longitude: string) {
+  searchNearby(
+    @Query('latitude') latitude: string,
+    @Query('longitude') longitude: string,
+  ) {
     return this.riderService.searchNearby(+latitude, +longitude);
   }
 
@@ -40,7 +53,10 @@ export class RiderController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update rider by ID' })
   @ApiParam({ name: 'id', type: Number })
-  update(@Param('id') id: string, @Body(ValidationPipe) updateRiderDto: UpdateRiderDto) {
+  update(
+    @Param('id') id: string,
+    @Body(ValidationPipe) updateRiderDto: UpdateRiderDto,
+  ) {
     return this.riderService.update(+id, updateRiderDto);
   }
 

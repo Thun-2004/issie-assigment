@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { RiderService } from './riders.service';
 import { PrismaService } from '../prisma.service';
@@ -47,8 +46,6 @@ describe('RiderService', () => {
         data: mockedResult,
       });
     });
-    
-    
 
     it('should throw BadRequestException on duplicate error', async () => {
       jest.spyOn(prisma.rider, 'create').mockRejectedValue({
@@ -103,7 +100,9 @@ describe('RiderService', () => {
 
   describe('searchNearby', () => {
     it('should throw BadRequestException when latitude/longitude is NaN', async () => {
-      await expect(service.searchNearby(NaN, 100)).rejects.toThrow(BadRequestException);
+      await expect(service.searchNearby(NaN, 100)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should return rider within radius', async () => {

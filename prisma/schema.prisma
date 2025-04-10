@@ -1,16 +1,9 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// generator client {
-//   provider = "prisma-client-js"
-//   output   = "../generated/prisma"
-// }
-
- generator client {
+generator client {
   provider = "prisma-client-js"
-  output = "../../node_modules/.prisma/client"
 }
-
 
 datasource db {
   provider = "sqlite"
@@ -26,8 +19,8 @@ model Rider {
   phoneNumber  String   @unique
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  
-  locations    Location[]
+
+  locations Location[]
 }
 
 model Location {
